@@ -174,15 +174,13 @@ void ModelUtil::AddSpatialBNOp(const std::string &input,
   }
   predict.AddInput(output + "_scale");
   predict.AddInput(output + "_bias");
-  if (!test)
-    predict.AddSpatialBNOp({input, output + "_scale", output + "_bias",
-                            output + "_mean", output + "_var"},
-                           {output, output + "_mean", output + "_var",
-                            output + "_saved_mean", output + "_saved_var"},
-                           epsilon, momentum, test);
-  else
-    predict.AddSpatialBNOp({input, output + "_scale", output + "_bias"},
-                           {output}, epsilon, momentum, test);
+  predict.AddInput(output + "_mean");
+  predict.AddInput(output + "_var");
+  predict.AddSpatialBNOp({input, output + "_scale", output + "_bias", output + "_mean", output + "_var"},
+                         test?
+                         {output}:
+                         {output, output + "_mean", output + "_var", output + "_saved_mean", output + "_saved_var"},
+                         epsilon, momentum, test);
 }
 
 void ModelUtil::Split(const std::string &layer, ModelUtil &firstModel,
